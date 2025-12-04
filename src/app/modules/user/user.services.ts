@@ -1,36 +1,41 @@
 
 import { prisma } from "../../../lib/prisma.js";
 import { IUser } from "../../../type/index.js";
+import { hashPassword } from "../../../utils/hash.utils.js";
 import AppError from "../../middlewares/appError.js";
 import { GetAllUsersParams } from "./user.interfaces.js";
 
 
 export const UserServices = {
-  // Create User
-  async createUser(payload:IUser ) {
-    if(!payload.email){
-         throw new AppError(404,"Email not found")
-    }
-    const record = await prisma.user.findFirst({
-          where:{
-             email:payload?.email
-          }
-    })
-   if(record){
-      throw new AppError(409,"User already exist")
-   }
 
-    // 
+  // Create User
+async createUser(payload: IUser) {
+    if (!payload.email) {
+    throw new AppError(404, "Email not found");
+  }
+
+  const record = await prisma.user.findFirst({
+    where: { email: payload.email },
+  });
+
+  if (record) {
+    throw new AppError(409, "User already exists");
+  }
+
+  // Hash the password
+  const hashedPassword = await hashPassword(payload.password);
+
   const user = await prisma.user.create({
     data: {
       userName: payload.userName,
       email: payload.email,
-      passwordHash: payload.password,
+      passwordHash: hashedPassword, // save hashed password
       image: payload.image,
     },
   });
-    return user;
-  },
+
+  return user;
+},
 
   // Update User
   async updateUser(id: number | string, payload: IUser) {

@@ -14,13 +14,11 @@ export const createUserZodSchema = z.object({
     .toLowerCase()
     .email({ message: "Invalid email address" }),
 
-  emailVerified: z.boolean().optional(),
-
   image: z.string().url().optional(),
 
-  role: z.enum(Object.values(Role) as string[]).optional(),
+  password :z.string().optional(),
 
-  refreshToken: z.string().optional(),
+  role: z.enum(Object.values(Role) as string[]).optional(),
 });
 
 // --------------------
