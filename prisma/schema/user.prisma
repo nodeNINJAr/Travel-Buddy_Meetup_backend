@@ -1,0 +1,25 @@
+model User {
+  id             Int      @id @default(autoincrement())
+  userName       String
+  email          String   @unique
+  emailVerified  Boolean  @default(false)
+  image          String?
+  role           Role     @default(USER)
+  refreshToken   String? 
+
+  lastActive     DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  profile          Profile?
+  travelPlans      TravelPlan[]
+  reviewsGiven     Review[]  @relation("reviewsFrom")
+  reviewsReceived  Review[]  @relation("reviewsTo")
+  messagesSent     Message[] @relation("messagesFrom")
+  messagesReceived Message[] @relation("messagesTo")
+  friendships      Friendship[] @relation("friendshipsUser")
+  friendsOf        Friendship[] @relation("friendshipsFriend")
+
+  @@map("users")
+}

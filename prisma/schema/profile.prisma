@@ -1,0 +1,18 @@
+model Profile {
+  id              Int       @id @default(autoincrement())
+  userId          Int    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio             String?
+  fullName        String? 
+  travelInterests String[]
+  visitedCountries String[]
+  currentLocation String?
+  verified        Boolean   @default(false)
+  rating          Float     @default(0)
+  reviewCount     Int       @default(0)
+  dateOfBirth     DateTime?
+  gender          String?
+  avatarUrl       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

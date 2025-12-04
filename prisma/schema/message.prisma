@@ -1,0 +1,10 @@
+model Message {
+  id         Int      @id @default(autoincrement())
+  fromUserId Int
+  fromUser   User     @relation("messagesFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   Int
+  toUser     User     @relation("messagesTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}

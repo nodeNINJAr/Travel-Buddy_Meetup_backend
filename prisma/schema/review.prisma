@@ -1,0 +1,14 @@
+model Review {
+  id           Int        @id @default(autoincrement())
+  fromUserId   Int
+  fromUser     User       @relation("reviewsFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId     Int
+  toUser       User       @relation("reviewsTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  travelPlanId Int?
+  travelPlan   TravelPlan? @relation(fields: [travelPlanId], references: [id], onDelete: SetNull)
+  rating       Int
+  comment      String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now())
+  @@map("reviews")
+}

@@ -1,0 +1,22 @@
+
+enum Role {
+     USER
+     ADMIN
+} 
+
+enum UserStatus {
+      ACTIVE
+      INACTIVE
+}
+
+enum Gender {
+     MALE
+     FEMALE
+}
+
+enum FriendshipStatus {
+    PENDING
+    ACCEPTED
+    BLOCKED
+     // pending, accepted, blocked
+}

@@ -1,0 +1,10 @@
+model Friendship {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  user      User   @relation("friendshipsUser", fields: [userId], references: [id], onDelete: Cascade)
+  friendId  Int
+  friend    User   @relation("friendshipsFriend", fields: [friendId], references: [id], onDelete: Cascade)
+  status    FriendshipStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}

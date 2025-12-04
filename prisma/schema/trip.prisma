@@ -1,0 +1,21 @@
+model TravelPlan {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination String
+  country     String
+  startDate   DateTime
+  endDate     DateTime
+  budgetMin   Int?
+  budgetMax   Int?
+  travelType  String
+  description String?
+  interests   String[]
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+
+  reviews     Review[]
+
+  @@map("trips")
+}
