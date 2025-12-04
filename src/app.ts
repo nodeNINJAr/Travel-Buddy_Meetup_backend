@@ -1,10 +1,9 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
-import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import notFound from './app/middlewares/notFound';
-import config from './config';
-import { uptime } from 'process';
-import { timeStamp } from 'console';
+import config from "./config/index.js"
+import globalErrorHandler from './app/middlewares/globalErrorHandler.js';
+import notFound from './app/middlewares/notFound.js';
+
 
 const app: Application = express();
 app.use(cors({
@@ -17,12 +16,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.get('/', (req: Request, res: Response) => {
+
+// 
+app.get('/', async (req: Request, res: Response) => {
+    // 
     res.send({
         message: "Travel buddy meetup Server is running..",
         environment: config.node_env,
         uptime: process.uptime().toFixed(2) + " sec",
-        timeStamp: new Date().toISOString()
+        timeStamp: new Date().toISOString(),
     })
 });
 

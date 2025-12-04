@@ -1,46 +1,99 @@
-import { Server } from 'http';
-import app from './app';
-import config from './config';
+import http, { Server } from "http";
+import dotenv from "dotenv";
+import app from "./app.js";
+import { prisma } from "./lib/prisma.js";
+import readline from "readline";
 
+dotenv.config();
 
-async function bootstrap() {
-    // This variable will hold our server instance
-    let server: Server;
+let server: Server | null = null;
 
-    try {
-        // Start the server
-        server = app.listen(config.port, () => {
-            console.log(`🚀 Server is running on http://localhost:${config.port}`);
-        });
+// 
+if (process.platform === "win32") {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
-        // Function to gracefully shut down the server
-        const exitHandler = () => {
-            if (server) {
-                server.close(() => {
-                    console.log('Server closed gracefully.');
-                    process.exit(1); // Exit with a failure code
-                });
-            } else {
-                process.exit(1);
-            }
-        };
-
-        // Handle unhandled promise rejections
-        process.on('unhandledRejection', (error) => {
-            console.log('Unhandled Rejection is detected, we are closing our server...');
-            if (server) {
-                server.close(() => {
-                    console.log(error);
-                    process.exit(1);
-                });
-            } else {
-                process.exit(1);
-            }
-        });
-    } catch (error) {
-        console.error('Error during server startup:', error);
-        process.exit(1);
-    }
+  rl.on("SIGINT", () => {
+    process.emit("SIGINT");
+  });
 }
 
-bootstrap();
+  //  Connect to Prisma Database  */
+async function connectToDb() {
+  try {
+    await prisma.$connect();
+    console.log("🟢 Database connected successfully");
+  } catch (err) {
+    console.error("❌ Database connection failed:", err);
+    process.exit(1);
+  }
+}
+
+  //  Start HTTP Server
+async function startServer() {
+  try {
+    await connectToDb();
+
+    const PORT = process.env.PORT || 5000;
+
+    server = http.createServer(app);
+
+    server.listen(PORT, () => {
+      console.log(`🚀 Server is running at http://localhost:${PORT}`);
+    });
+
+    registerProcessEvents();
+  } catch (error) {
+    console.error("❌ Startup error:", error);
+    process.exit(1);
+  }
+}
+
+
+  //  Graceful Shutdown Logic
+
+async function gracefulShutdown(reason: string) {
+  console.warn(`⚠️  Received ${reason}, performing graceful shutdown...`);
+
+  try {
+    // Close server first
+    if (server) {
+      await new Promise<void>((resolve) => server!.close(() => resolve()));
+      console.log("🔻 HTTP server closed");
+    }
+
+    // Disconnect Prisma
+    await prisma.$disconnect();
+    console.log("🔻 Database disconnected");
+
+    console.log("🟢 Shutdown complete");
+    process.exit(0);
+  } catch (err) {
+    console.error("❌ Error during shutdown:", err);
+    process.exit(1);
+  }
+}
+
+
+  //  Register system signal handlers
+function registerProcessEvents() {
+  ["SIGTERM", "SIGINT"].forEach((signal) => {
+    process.on(signal, () => gracefulShutdown(signal));
+  });
+
+  process.on("uncaughtException", (err) => {
+    console.error("💥 Uncaught Exception:", err);
+    gracefulShutdown("uncaughtException");
+  });
+
+  process.on("unhandledRejection", (reason) => {
+    console.error("💥 Unhandled Promise Rejection:", reason);
+    gracefulShutdown("unhandledRejection");
+  });
+}
+
+
+// 🚀 Boot Application
+startServer();
