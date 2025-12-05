@@ -1,10 +1,13 @@
 model Friendship {
-  id        Int    @id @default(autoincrement())
+  id        Int              @id @default(autoincrement())
   userId    Int
-  user      User   @relation("friendshipsUser", fields: [userId], references: [id], onDelete: Cascade)
+  user      User             @relation("friendshipsUser", fields: [userId], references: [id], onDelete: Cascade)
   friendId  Int
-  friend    User   @relation("friendshipsFriend", fields: [friendId], references: [id], onDelete: Cascade)
+  friend    User             @relation("friendshipsFriend", fields: [friendId], references: [id], onDelete: Cascade)
   status    FriendshipStatus @default(PENDING)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  message   String?
+  tripId    Int?
+  trip      TravelPlan?      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now())
 }

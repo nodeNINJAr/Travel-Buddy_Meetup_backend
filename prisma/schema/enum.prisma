@@ -7,6 +7,7 @@ enum Role {
 enum UserStatus {
       ACTIVE
       INACTIVE
+      BLOCKED
 }
 
 enum Gender {
@@ -18,5 +19,4 @@ enum FriendshipStatus {
     PENDING
     ACCEPTED
     BLOCKED
-     // pending, accepted, blocked
 }

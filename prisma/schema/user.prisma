@@ -3,9 +3,11 @@ model User {
   userName       String
   email          String   @unique
   emailVerified  Boolean  @default(false)
+  passwordHash   String
   image          String?
   role           Role     @default(USER)
   refreshToken   String? 
+  activeStatus   UserStatus  @default(ACTIVE)
 
   lastActive     DateTime @default(now())
   createdAt      DateTime @default(now())
