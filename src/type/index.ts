@@ -11,7 +11,7 @@ export interface IUser {
 
 
 export interface VUser{
-    id: number;
+     userId: number;
     email: string;
     role: Role;
     emailVerified:boolean;

@@ -3,7 +3,7 @@ import { prisma } from "../../../lib/prisma.js";
 import { IUser } from "../../../type/index.js";
 import { hashPassword } from "../../../utils/hash.utils.js";
 import AppError from "../../middlewares/appError.js";
-import { GetAllUsersParams } from "./user.interfaces.js";
+import { GetAllUsersParams, IUserProfile } from "./user.interfaces.js";
 
 
 export const UserServices = {
@@ -39,7 +39,15 @@ async createUser(payload: IUser) {
 
   // Update User
   async updateUser(id: number | string, payload: IUser) {
-    const user = await prisma.user.update({
+    // 
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!user) {
+      throw new AppError(404, "User not found");
+    }
+    // 
+    const updatedUser = await prisma.user.update({
       where: { id: Number(id) },
       data: {
       userName: payload.userName,
@@ -47,7 +55,7 @@ async createUser(payload: IUser) {
       image: payload.image,
     },
     });
-    return user;
+    return updatedUser;
   },
 
   // Get All Users with pagination, filtering
@@ -100,8 +108,53 @@ async createUser(payload: IUser) {
 
   // Delete User
   async deleteUser(id: number | string) {
+     // Find User
+     const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!user) {
+      throw new AppError(404, "User not found");
+    }
+
+    // Delete User 
     return await prisma.user.delete({
       where: { id: Number(id) },
     });
+    
   },
+
+  // update user profile
+  async createUserProfile(userId: number | string, payload:IUserProfile) {
+    // find user profile
+    const user = await prisma.profile.findFirst({
+      where: { userId: Number(userId) },
+    });
+    if (user) {
+      throw new AppError(404, "User already have a profile");
+    }
+    // 
+    const updatedProfile = await prisma.profile.create({
+      data:{
+        ...payload,
+        userId: Number(userId)
+      }
+    });
+  
+    return updatedProfile
+  },
+
+
+
+//  get user profile
+async getUserProfile(userId: number | string) {
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    include: { profile: true },
+  });
+  return user;
+},
+
+
+
 };

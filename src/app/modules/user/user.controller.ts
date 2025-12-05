@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import { StatusCodes } from "http-status-codes";
 import { UserServices } from "./user.services.js";
+import { VUser } from "../../../type/index.js";
 
 
 // Create User
@@ -75,6 +76,33 @@ const deleteUser = catchAsync(async (req: Request, res: Response, next: NextFunc
   });
 });
 
+
+// Update Profile
+const createUserProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = await UserServices.createUserProfile((req.user as VUser).userId, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User profile created Successfully",
+    data: user,
+  });
+});
+
+// Get User Profile 
+const getUserProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = await UserServices.getUserProfile((req.user as VUser).userId);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User profile retrieved successfully",
+    data: user,
+  });
+});
+
+
+
 // Export Controllers
 export const UserControllers = {
   createUser,
@@ -82,4 +110,7 @@ export const UserControllers = {
   getAllUsers,
   getUserById,
   deleteUser,
+  createUserProfile,
+  getUserProfile,
+
 };
