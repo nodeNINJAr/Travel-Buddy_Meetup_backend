@@ -17,5 +17,6 @@ model TravelPlan {
   reviews     Review[]
   friendships Friendship[]
 
+
   @@map("trips")
 }

@@ -150,4 +150,63 @@ export const TravelServices = {
       where: { id },
     });
   },
+ 
+
+  // 
+async joinTravelPlan(tripId: number, userId: number) {
+  // Check if travel plan exists
+  const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId } });
+  if (!travelPlan) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
+  }
+
+  // Prevent owner from joining their own trip
+  // if (travelPlan.userId === userId) {
+  //   throw new AppError(StatusCodes.BAD_REQUEST, "You are already the owner of this trip");
+  // }
+
+  // Check if user already joined
+  const existing = await prisma.friendship.findFirst({
+    where: {
+      tripId,
+      friendId: userId,
+    },
+  });
+  if (existing) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "You have already joined this trip");
+  }
+
+  // Create a new friendship record
+  const friendship = await prisma.friendship.create({
+    data: {
+      userId: travelPlan.userId, // owner
+      friendId: userId,          // joining user
+      tripId: tripId,
+      status: "PENDING",         // or "ACCEPTED" if auto-approved
+    },
+  });
+
+  return friendship;
+},
+
+// 
+async getJoinedUsers(tripId: number, userId: number) {
+  console.log(tripId, userId)
+  // Check if travel plan exists
+  const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId, userId } });
+  if (!travelPlan) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
+  }
+
+  // Fetch all joined users via Friendship table
+  const joinedUsers = await prisma.friendship.findMany({
+    where: { tripId }, 
+    include: { friend: true },          
+  });
+
+  // Map to only user data
+  return joinedUsers.map(f => f.friend);
+}
+
+
 };

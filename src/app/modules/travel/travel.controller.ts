@@ -80,10 +80,52 @@ const deleteTravelPlan = catchAsync(async (req: Request, res: Response, next: Ne
     });
 });
 
+// make an join req
+const joinTravelPlan = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as VUser;
+    const result = await TravelServices.joinTravelPlan(Number(req.params.id), user.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan joined successfully",
+        data: result,
+    });
+}); 
+// get joined users
+const getJoinedUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as VUser;
+    const result = await TravelServices.getJoinedUsers(Number(req.params.id), user.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan joined successfully",
+        data: result,
+    });
+}); 
+
+
+// get joined users admin
+const getJoinedUsersAdmin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    console.log("fromValues",(req.query))
+    const result = await TravelServices.getJoinedUsers(Number(req.query.id), Number(req.query.userId));
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan joined successfully",
+        data: result,
+    });
+});
+
 export const TravelController = {
     createTravelPlan,
     getAllTravelPlans,
     getTravelPlanById,
     updateTravelPlan,
     deleteTravelPlan,
+    joinTravelPlan,
+    getJoinedUsers,
+    getJoinedUsersAdmin
 };
