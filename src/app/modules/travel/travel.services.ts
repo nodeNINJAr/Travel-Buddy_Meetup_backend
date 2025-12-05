@@ -8,6 +8,24 @@ import { StatusCodes } from "http-status-codes";
 export const TravelServices = {
   // Create Travel Plan
   async createTravelPlan(userId: number, payload: ITravelPlan) {
+       const record = await prisma.travelPlan.findFirst({
+           where:{
+              userId,
+              startDate:payload.startDate,
+              endDate:payload.endDate,
+              destination:payload.destination,
+              country:payload.country,
+              description:payload.description,
+              travelType:payload.travelType,
+              budgetMin:payload.budgetMin,
+              budgetMax:payload.budgetMax,
+           }
+       });
+
+       if(record){
+           throw new AppError(StatusCodes.BAD_REQUEST, "Travel plan already exists");
+       }
+    // 
     const travelPlan = await prisma.travelPlan.create({
       data: {
         ...payload,
@@ -67,7 +85,7 @@ export const TravelServices = {
       orderBy: { [sortBy]: sortOrder },
       skip,
       take: limit,
-      include: { user: true }, // Include creator details
+      include: { user: {select:{userName:true, email:true, image:true}} }
     });
 
     return {
@@ -84,7 +102,7 @@ export const TravelServices = {
   async getTravelPlanById(id: number) {
     const travelPlan = await prisma.travelPlan.findUnique({
       where: { id },
-      include: { user: true, reviews: true },
+      include: { user: {select:{userName:true, email:true, image:true}}, reviews: true },
     });
 
     if (!travelPlan) {
@@ -106,7 +124,7 @@ export const TravelServices = {
     if (travelPlan.userId !== userId) {
       throw new AppError(StatusCodes.FORBIDDEN, "You are not authorized to update this trip");
     }
-
+    
     const updatedTravelPlan = await prisma.travelPlan.update({
       where: { id },
       data: payload,

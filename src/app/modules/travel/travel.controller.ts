@@ -10,7 +10,6 @@ const createTravelPlan = catchAsync(async (req: Request, res: Response, next: Ne
     // Assuming req.user is attached by auth middleware
     const user = req.user as VUser;
     
-    // Convert dates if came as string, or rely on service/validation
     const result = await TravelServices.createTravelPlan(user.userId, req.body);
 
     sendResponse(res, {

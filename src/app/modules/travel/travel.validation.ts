@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-const createTravelPlanZodSchema = z.object({
-  body: z.object({
+export const createTravelPlanZodSchema = z.object({
     destination: z.string(),
     country: z.string(),
     startDate: z.string().refine((date) => new Date(date).toString() !== 'Invalid Date', {
@@ -15,11 +14,9 @@ const createTravelPlanZodSchema = z.object({
     travelType: z.string(),
     description: z.string().optional(),
     interests: z.array(z.string()).optional(),
-  }),
 });
 
-const updateTravelPlanZodSchema = z.object({
-  body: z.object({
+export const updateTravelPlanZodSchema = z.object({
     destination: z.string().optional(),
     country: z.string().optional(),
     startDate: z.string().optional().refine((date) => !date || new Date(date).toString() !== 'Invalid Date', {
@@ -32,11 +29,10 @@ const updateTravelPlanZodSchema = z.object({
     budgetMax: z.number().int().nonnegative().optional(),
     travelType: z.string().optional(),
     description: z.string().optional(),
-    interests: z.array(z.string()).optional(),
-  }),
+    interests: z.array(z.string()).optional()
 });
 
-export const TravelValidation = {
-  createTravelPlanZodSchema,
-  updateTravelPlanZodSchema,
-};
+// export const TravelValidation = {
+//   createTravelPlanZodSchema,
+//   updateTravelPlanZodSchema,
+// };

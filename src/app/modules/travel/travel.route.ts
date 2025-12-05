@@ -1,45 +1,24 @@
 import { Router } from "express";
 import { TravelController } from "./travel.controller.js";
 import { checkVerifiedUser } from "../../middlewares/checkVerifiedUser.js";
+import { createTravelPlanZodSchema, updateTravelPlanZodSchema} from "./travel.validation.js";
 import { validationRequest } from "../../middlewares/validationReq.js";
-import { TravelValidation } from "./travel.validation.js";
 
 const router = Router();
 
 // Create Travel Plan
-router.post(
-    "/",
-    checkVerifiedUser(),
-    validationRequest(TravelValidation.createTravelPlanZodSchema),
-    TravelController.createTravelPlan
-);
+router.post("/create", validationRequest(createTravelPlanZodSchema),checkVerifiedUser(),TravelController.createTravelPlan);
 
 // Get All Travel Plans
-router.get(
-    "/",
-    // checkVerifiedUser(), 
-    TravelController.getAllTravelPlans
-);
+router.get("/",checkVerifiedUser(),TravelController.getAllTravelPlans);
 
 // Get Single Travel Plan
-router.get(
-    "/:id",
-    TravelController.getTravelPlanById
-);
+router.get("/:id",TravelController.getTravelPlanById);
 
 // Update Travel Plan
-router.patch(
-    "/:id",
-    checkVerifiedUser(),
-    validationRequest(TravelValidation.updateTravelPlanZodSchema),
-    TravelController.updateTravelPlan
-);
+router.patch("/:id",checkVerifiedUser(),validationRequest(updateTravelPlanZodSchema),TravelController.updateTravelPlan);
 
 // Delete Travel Plan
-router.delete(
-    "/:id",
-    checkVerifiedUser(),
-    TravelController.deleteTravelPlan
-);
+router.delete("/:id",checkVerifiedUser(),TravelController.deleteTravelPlan);
 
 export const TravelRoutes = router;
