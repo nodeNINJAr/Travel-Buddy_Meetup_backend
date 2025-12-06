@@ -18,6 +18,10 @@ const moduleRoutes = [
    {
        path: '/travel',
        route: TravelRoutes,
+   },
+    {
+       path: '/rating',
+       route: TravelRoutes,
    }
 ];
 

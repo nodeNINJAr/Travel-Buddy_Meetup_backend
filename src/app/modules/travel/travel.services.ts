@@ -1,4 +1,4 @@
-import { Prisma } from "../../../generated/prisma/client.js";
+import { FriendshipStatus, Prisma, TravelPlanStatus } from "../../../generated/prisma/client.js";
 import { prisma } from "../../../lib/prisma.js";
 import AppError from "../../middlewares/appError.js";
 import { ITravelPlan, ITravelPlanResult } from "./travel.interface.js";
@@ -159,11 +159,15 @@ async joinTravelPlan(tripId: number, userId: number) {
   if (!travelPlan) {
     throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
   }
+  // 
+    if (travelPlan.status === TravelPlanStatus.INACTIVE ) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
+  }
 
   // Prevent owner from joining their own trip
-  // if (travelPlan.userId === userId) {
-  //   throw new AppError(StatusCodes.BAD_REQUEST, "You are already the owner of this trip");
-  // }
+  if (travelPlan.userId === userId) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "You are already the owner of this trip");
+  }
 
   // Check if user already joined
   const existing = await prisma.friendship.findFirst({
@@ -182,7 +186,7 @@ async joinTravelPlan(tripId: number, userId: number) {
       userId: travelPlan.userId, // owner
       friendId: userId,          // joining user
       tripId: tripId,
-      status: "PENDING",         // or "ACCEPTED" if auto-approved
+      status: FriendshipStatus.PENDING,         // or "ACCEPTED" if auto-approved
     },
   });
 
@@ -191,6 +195,24 @@ async joinTravelPlan(tripId: number, userId: number) {
 
 // 
 async getJoinedUsers(tripId: number, userId: number) {
+  console.log(tripId, userId)
+  // Check if travel plan exists
+  const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId, userId } });
+  if (!travelPlan) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
+  }
+
+  // Fetch all joined users via Friendship table
+  const joinedUsers = await prisma.friendship.findMany({
+    where: { tripId }, 
+    include: { friend: true },          
+  });
+
+  // Map to only user data
+  return joinedUsers.map(f => f.friend);
+},
+// 
+async getJoinedUsersadmin(tripId: number, userId: number) {
   console.log(tripId, userId)
   // Check if travel plan exists
   const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId, userId } });

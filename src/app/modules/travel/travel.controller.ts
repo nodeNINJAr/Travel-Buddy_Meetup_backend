@@ -107,14 +107,18 @@ const getJoinedUsers = catchAsync(async (req: Request, res: Response, next: Next
 
 
 // get joined users admin
-const getJoinedUsersAdmin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    console.log("fromValues",(req.query))
-    const result = await TravelServices.getJoinedUsers(Number(req.query.id), Number(req.query.userId));
+const getJoinedUsersAdmin = catchAsync(async (req: Request, res: Response) => {
+    const tripId = Number(req.query.id);
+    const userId = Number(req.query.userId);
+
+    console.log("tripId:", tripId, "userId:", userId);
+
+    const result = await TravelServices.getJoinedUsersadmin(tripId, userId);
 
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,
-        message: "Travel plan joined successfully",
+        message: "Joined users fetched successfully",
         data: result,
     });
 });
