@@ -1,10 +1,11 @@
 import { prisma } from "../../../lib/prisma.js";
 import AppError from "../../middlewares/appError.js";
+import { Ireviews } from "./review.interface.js";
 
 
 export const ReviewService = {
   // Create review with duplicate prevention
-  createReview: async (fromUserId:number, toUserId:number,travelPlanId:number,payload: any) => {
+  createReview: async (fromUserId:number, toUserId:number,travelPlanId:number,payload:Ireviews) => {
 
     // 
     const exists = await prisma.review.findFirst({

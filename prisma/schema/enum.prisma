@@ -25,3 +25,9 @@ enum FriendshipStatus {
      ACCEPTED
      BLOCKED
 }
+
+enum ReviewStatus {
+      PENDING
+      APPROVED
+      REJECT
+}
