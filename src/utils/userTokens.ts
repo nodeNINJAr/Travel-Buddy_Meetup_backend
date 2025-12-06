@@ -15,7 +15,7 @@ import { UserStatus } from "../generated/prisma/enums.js";
 export const createUserTokens = async(user : Partial<VUser>)=>{
      // 
      const jwtPayload = {
-         userId:user.id,
+         userId:user?.id,
          email:user.email,
          role:user.role,
          emailVerified:user.emailVerified,
