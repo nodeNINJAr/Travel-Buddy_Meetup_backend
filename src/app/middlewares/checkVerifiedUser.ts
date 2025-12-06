@@ -25,7 +25,7 @@ export const checkVerifiedUser = (...authRoles:string[])=>(async(req:Request, re
        });
         //   
         if(!isUserExist){
-            throw new AppError(StatusCodes.BAD_REQUEST, "Email Does Not exist")
+            throw new AppError(StatusCodes.BAD_REQUEST, "Please login first")
         }  
          //  
         if(isUserExist.activeStatus === UserStatus.BLOCKED){
