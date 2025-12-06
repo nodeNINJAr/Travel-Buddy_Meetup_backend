@@ -1,13 +1,12 @@
-
 enum Role {
      USER
      ADMIN
-} 
+}
 
 enum UserStatus {
-      ACTIVE
-      INACTIVE
-      BLOCKED
+     ACTIVE
+     INACTIVE
+     BLOCKED
 }
 
 enum Gender {
@@ -15,8 +14,20 @@ enum Gender {
      FEMALE
 }
 
+enum TravelPlanStatus {
+     ACTIVE
+     INACTIVE
+     BLOCKED
+}
+
 enum FriendshipStatus {
-    PENDING
-    ACCEPTED
-    BLOCKED
+     PENDING
+     ACCEPTED
+     BLOCKED
+}
+
+enum ReviewStatus {
+      PENDING
+      APPROVED
+      REJECT
 }

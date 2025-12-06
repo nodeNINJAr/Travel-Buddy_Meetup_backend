@@ -20,5 +20,14 @@ router.patch("/:id",checkVerifiedUser(),validationRequest(updateTravelPlanZodSch
 
 // Delete Travel Plan
 router.delete("/:id",checkVerifiedUser(),TravelController.deleteTravelPlan);
+// 
+router.patch("/join/:id",checkVerifiedUser(),TravelController.joinTravelPlan);
+
+// get joined users
+router.get("/joined-users/:id",checkVerifiedUser(),TravelController.getJoinedUsers);
+// 
+router.get("/admin/joined-users", checkVerifiedUser(), TravelController.getJoinedUsersAdmin);
+// 
+
 
 export const TravelRoutes = router;

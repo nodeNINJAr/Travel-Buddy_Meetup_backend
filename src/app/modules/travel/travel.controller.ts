@@ -3,12 +3,12 @@ import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import { StatusCodes } from "http-status-codes";
 import { TravelServices } from "./travel.services.js";
-import { VUser } from "../../../type/index.js";
+import { JwtPayload } from "jsonwebtoken";
 
 // Create Travel Plan
 const createTravelPlan = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // Assuming req.user is attached by auth middleware
-    const user = req.user as VUser;
+    const user = req.user as JwtPayload;
     
     const result = await TravelServices.createTravelPlan(user.userId, req.body);
 
@@ -56,7 +56,7 @@ const getTravelPlanById = catchAsync(async (req: Request, res: Response, next: N
 
 // Update Travel Plan
 const updateTravelPlan = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as VUser;
+    const user = req.user as JwtPayload;
     const result = await TravelServices.updateTravelPlan(Number(req.params.id), req.body, user.userId);
 
     sendResponse(res, {
@@ -69,7 +69,7 @@ const updateTravelPlan = catchAsync(async (req: Request, res: Response, next: Ne
 
 // Delete Travel Plan
 const deleteTravelPlan = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as VUser;
+    const user = req.user as JwtPayload;
     await TravelServices.deleteTravelPlan(Number(req.params.id), user.userId);
 
     sendResponse(res, {
@@ -80,10 +80,56 @@ const deleteTravelPlan = catchAsync(async (req: Request, res: Response, next: Ne
     });
 });
 
+// make an join req
+const joinTravelPlan = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const result = await TravelServices.joinTravelPlan(Number(req.params.id), user.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan joined successfully",
+        data: result,
+    });
+}); 
+// get joined users
+const getJoinedUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const result = await TravelServices.getJoinedUsers(Number(req.params.id), user.userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan joined successfully",
+        data: result,
+    });
+}); 
+
+
+// get joined users admin
+const getJoinedUsersAdmin = catchAsync(async (req: Request, res: Response) => {
+    const tripId = Number(req.query.id);
+    const userId = Number(req.query.userId);
+
+    console.log("tripId:", tripId, "userId:", userId);
+
+    const result = await TravelServices.getJoinedUsersadmin(tripId, userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Joined users fetched successfully",
+        data: result,
+    });
+});
+
 export const TravelController = {
     createTravelPlan,
     getAllTravelPlans,
     getTravelPlanById,
     updateTravelPlan,
     deleteTravelPlan,
+    joinTravelPlan,
+    getJoinedUsers,
+    getJoinedUsersAdmin
 };
