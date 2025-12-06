@@ -39,7 +39,7 @@ router.delete("/:id", checkVerifiedUser(), ReviewController.deleteReview);
 // status Update
 router.patch(
   "/:id/status",
-   checkVerifiedUser(),
+   checkVerifiedUser(Role.ADMIN),
   ReviewController.updateReviewStatus
 );
 

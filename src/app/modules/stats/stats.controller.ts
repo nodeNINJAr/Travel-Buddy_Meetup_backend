@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import { StatsService } from "./stats.service.js";
 import {StatusCodes} from "http-status-codes"
+import { JwtPayload } from "jsonwebtoken";
 
 
 
@@ -43,7 +44,18 @@ export const StatsController = {
       data: stats,
     });
   }),
+  //  
+   getUserStats: catchAsync(async (req: Request, res: Response) => {
+    const user =req.user as JwtPayload;
+    const stats = await StatsService.getUserStats(Number(user?.userId));
 
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "User stats fetched successfully",
+      data: stats,
+    });
+  }),
 
 
 

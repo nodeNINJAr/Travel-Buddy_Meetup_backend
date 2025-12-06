@@ -4,15 +4,16 @@ import catchAsync from "../../shared/catchAsync.js";
 import sendResponse from "../../shared/sendResponse.js";
 import { ReviewService } from "./review.service.js";
 import AppError from "../../middlewares/appError.js";
-import { VUser } from "../../../type/index.js";
 import { ReviewStatus } from "../../../generated/prisma/enums.js";
+import { ReviewQueryParams } from "./review.interface.js";
+import { JwtPayload } from "jsonwebtoken";
 
 export const ReviewController = {
   createReview: catchAsync(async (req: Request, res: Response) => {
 
    const toUserId = req?.query?.toUserId;
    const travelPlanId = req?.query?.travelPlanId;
-   const {userId} = req?.user as VUser;
+   const {userId} = req?.user as JwtPayload;
 
   //  
    if(!toUserId || !travelPlanId || !userId){
@@ -30,7 +31,7 @@ export const ReviewController = {
   }),
 
   getAllReviews: catchAsync(async (req: Request, res: Response) => {
-    const result = await ReviewService.getAllReviews(req.query);
+    const result = await ReviewService.getAllReviews(req.query as ReviewQueryParams );
 
     sendResponse(res, {
       success: true,
@@ -41,7 +42,7 @@ export const ReviewController = {
   }),
 
   getReviewById: catchAsync(async (req: Request, res: Response) => {
-    const user  = req?.user as VUser
+    const user  = req?.user as JwtPayload
     // 
     const result = await ReviewService.getReviewById(Number(req.params.id),+user?.userId,);
 

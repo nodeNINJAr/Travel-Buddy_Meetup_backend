@@ -108,7 +108,43 @@ export const StatsService = {
       avgRating: Number(avgRating.toFixed(2)),
     };
   },
+  // get user stats
+   getUserStats: async (userId: number) => {
+    // Check if user exists
+    const userExists = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userExists) throw new Error("User not found");
 
+    // Total Plans
+    const totalPlans = await prisma.travelPlan.count({
+      where: { userId },
+    });
+
+    // Active Plans
+    const activePlans = await prisma.travelPlan.count({
+      where: { userId, status: TravelPlanStatus.ACTIVE },
+    });
+
+    // Average Rating (reviews received)
+    const avgRatingAgg = await prisma.review.aggregate({
+      _avg: { rating: true },
+      where: { toUserId: userId },
+    });
+    const avgRating = avgRatingAgg._avg.rating || 0;
+
+    // Countries (distinct)
+    const countriesRaw = await prisma.travelPlan.findMany({
+      where: { userId },
+      select: { country: true },
+    });
+    const countries = Array.from(new Set(countriesRaw.map(c => c.country)));
+
+    return {
+      totalPlans,
+      activePlans,
+      avgRating: Number(avgRating.toFixed(2)),
+      countries,
+    };
+  },
 
   // ending
 };

@@ -28,6 +28,10 @@ const moduleRoutes = [
        {
        path: '/admin/stats',
        route: StatsRoutes,
+   },
+    {
+       path: '/stats',
+       route: StatsRoutes,
    }
 ];
 

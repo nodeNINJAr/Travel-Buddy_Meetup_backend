@@ -1,7 +1,7 @@
 import { ReviewStatus } from "../../../generated/prisma/enums.js";
 import { prisma } from "../../../lib/prisma.js";
 import AppError from "../../middlewares/appError.js";
-import { Ireviews } from "./review.interface.js";
+import { Ireviews, ReviewQueryParams } from "./review.interface.js";
 
 
 export const ReviewService = {
@@ -31,7 +31,7 @@ export const ReviewService = {
   },
 
   // Get all with filters, search, pagination
-  getAllReviews: async (query: any) => {
+  getAllReviews: async (query: ReviewQueryParams) => {
     const {
       page = 1,
       limit = 10,
@@ -115,7 +115,7 @@ export const ReviewService = {
         include: { fromUser: true, toUser: true, travelPlan: true },
       });
     },
-    
+
   // Summary (avg rating + total)
   getReviewSummary: async (userId: number) => {
     const [agg, list] = await prisma.$transaction([
