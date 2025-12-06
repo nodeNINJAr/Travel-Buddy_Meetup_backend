@@ -5,6 +5,7 @@ import sendResponse from "../../shared/sendResponse.js";
 import { ReviewService } from "./review.service.js";
 import AppError from "../../middlewares/appError.js";
 import { VUser } from "../../../type/index.js";
+import { ReviewStatus } from "../../../generated/prisma/enums.js";
 
 export const ReviewController = {
   createReview: catchAsync(async (req: Request, res: Response) => {
@@ -76,6 +77,30 @@ export const ReviewController = {
       data: null,
     });
   }),
+  
+  // 
+  updateReviewStatus: catchAsync(async (req: Request, res: Response) => {
+    const reviewId = Number(req.params.id);
+    const status = (req.query.status as string).toUpperCase() as ReviewStatus;
+
+    if (!status || !["APPROVED", "PENDING", "REJECT"].includes(status)) {
+      return sendResponse(res, {
+        success: false,
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: "Invalid or missing status",
+        data: undefined
+      });
+    }
+
+    const result = await ReviewService.updateReviewStatus(reviewId, status);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: `Review status updated to ${status}`,
+      data: result,
+    });
+  }),
 
   getReviewSummary: catchAsync(async (req: Request, res: Response) => {
     const result = await ReviewService.getReviewSummary(
@@ -89,4 +114,5 @@ export const ReviewController = {
       data: result,
     });
   }),
+
 };

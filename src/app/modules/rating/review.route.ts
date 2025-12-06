@@ -35,5 +35,12 @@ router.patch(
 
 // Delete
 router.delete("/:id", checkVerifiedUser(), ReviewController.deleteReview);
+// 
+// status Update
+router.patch(
+  "/:id/status",
+   checkVerifiedUser(),
+  ReviewController.updateReviewStatus
+);
 
 export const ReviewRoutes = router;
