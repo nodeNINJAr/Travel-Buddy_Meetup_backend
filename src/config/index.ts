@@ -13,4 +13,6 @@ export default {
     jwt_refresh_secret:process.env.JWT_REFRESH_SECRET!,
     jwt_refresh_expire:process.env.JWT_REFRESH_EXPIRES!,
     express_session_secret:process.env.EXPRESS_SESSION_SECRET!,
+    ADMIN_EMAIL:process.env.ADMIN_EMAIL!,
+    ADMIN_PASS:process.env.ADMIN_PASS!,
 }

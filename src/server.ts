@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import app from "./app.js";
 import { prisma } from "./lib/prisma.js";
 import readline from "readline";
+import { seedAdmin } from "./utils/seed.js";
 
 dotenv.config();
 
@@ -35,15 +36,15 @@ async function connectToDb() {
 async function startServer() {
   try {
     await connectToDb();
-
+    await seedAdmin()
     const PORT = process.env.PORT || 5000;
-
+   
     server = http.createServer(app);
 
     server.listen(PORT, () => {
       console.log(`🚀 Server is running at http://localhost:${PORT}`);
     });
-
+    
     registerProcessEvents();
   } catch (error) {
     console.error("❌ Startup error:", error);
