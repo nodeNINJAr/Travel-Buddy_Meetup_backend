@@ -23,6 +23,7 @@ export const StatsController = {
 
   //
     getPopularDestinations: catchAsync(async (req: Request, res: Response) => {
+      // 
     const destinations = await StatsService.getPopularDestinations();
 
     sendResponse(res, {

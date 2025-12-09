@@ -35,74 +35,261 @@ export const TravelServices = {
     return travelPlan;
   },
 
+    // Get All Travel Plans
+    async getAllTravelPlans(
+      params: {
+        page: number;
+        limit: number;
+        searchTerm?: string;
+        filters?: Record<string, any>;
+      }
+    ): Promise<ITravelPlanResult> {
+      const { page, limit, searchTerm, filters } = params;
+      const skip = (page - 1) * limit;
+
+      const where: Prisma.TravelPlanWhereInput = {};
+
+      // Search term
+      if (searchTerm) {
+        where.OR = [
+          { destination: { contains: searchTerm, mode: "insensitive" } },
+          { country: { contains: searchTerm, mode: "insensitive" } },
+          { description: { contains: searchTerm, mode: "insensitive" } },
+          { travelType: { contains: searchTerm, mode: "insensitive" } },
+        ];
+      }
+
+      console.log(filters);
+
+      // Filters
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            // Handle budget range filters
+            if (key === 'budgetMin') {
+              where.budgetMin = { lte: Number(value) };
+            } else if (key === 'budgetMax') {
+              where.budgetMax = { gte: Number(value) };
+            } 
+            // Handle date range filters
+            else if (key === 'startDate') {
+              where.startDate = { gte: new Date(value as string) };
+            } else if (key === 'endDate') {
+              where.endDate = { lte: new Date(value as string) };
+            }
+            // Handle array field (interests)
+            else if (key === 'interests') {
+              where.interests = { has: value };
+            }
+            // Handle exact match filters (travelType, destination, country, etc.)
+            else {
+              (where as any)[key] = value;
+            }
+          }
+        });
+      }
+
+      console.log(where);
+
+      const total = await prisma.travelPlan.count({ where });
+      const data = await prisma.travelPlan.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+        include: { 
+          user: {
+            select: {
+              userName: true, 
+              email: true, 
+              image: true
+            }
+          } 
+        }
+      });
+
+      return {
+        meta: {
+          page,
+          limit,
+          total,
+        },
+        data,
+      };
+    },
+
+
+
+   // Get All Travel Plans
+    async getAllTravelPlansAdmin(
+      params: {
+        page: number;
+        limit: number;
+        searchTerm?: string;
+        filters?: Record<string, any>;
+        sortBy: string;
+        sortOrder: "asc" | "desc"
+      }
+    ): Promise<ITravelPlanResult> {
+      const { page, limit, searchTerm, filters, sortBy, sortOrder } = params;
+      const skip = (page - 1) * limit;
+
+      const where: Prisma.TravelPlanWhereInput = {};
+
+      // Search term
+      if (searchTerm) {
+        where.OR = [
+          { destination: { contains: searchTerm, mode: "insensitive" } },
+          { country: { contains: searchTerm, mode: "insensitive" } },
+          { description: { contains: searchTerm, mode: "insensitive" } },
+          { travelType: { contains: searchTerm, mode: "insensitive" } },
+        ];
+      }
+
+      console.log(filters);
+
+      // Filters
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            // Handle budget range filters
+            if (key === 'budgetMin') {
+              where.budgetMin = { lte: Number(value) };
+            } else if (key === 'budgetMax') {
+              where.budgetMax = { gte: Number(value) };
+            } 
+            // Handle date range filters
+            else if (key === 'startDate') {
+              where.startDate = { gte: new Date(value as string) };
+            } else if (key === 'endDate') {
+              where.endDate = { lte: new Date(value as string) };
+            }
+            // Handle array field (interests)
+            else if (key === 'interests') {
+              where.interests = { has: value };
+            }
+            // Handle exact match filters (travelType, destination, country, etc.)
+            else {
+              (where as any)[key] = value;
+            }
+          }
+        });
+      }
+
+      const total = await prisma.travelPlan.count({ where });
+      const data = await prisma.travelPlan.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+        include: { 
+          user: {
+            select: {
+              userName: true, 
+              email: true, 
+              image: true
+            }
+          } 
+        }
+      });
+
+      return {
+        meta: {
+          page,
+          limit,
+          total,
+        },
+        data,
+      };
+    },
+
   // Get All Travel Plans
-  async getAllTravelPlans(
-    params: {
-      page: number;
-      limit: number;
-      sortBy: string;
-      sortOrder: "asc" | "desc";
-      searchTerm?: string;
-      filters?: Record<string, any>;
-    }
-  ): Promise<ITravelPlanResult> {
-    const { page, limit, sortBy, sortOrder, searchTerm, filters } = params;
-    const skip = (page - 1) * limit;
+    async getAllTravelPlansMine(
+      params: {
+        page: number;
+        limit: number;
+        sortBy: string;
+        sortOrder: "asc" | "desc";
+        searchTerm?: string;
+        filters?: Record<string, any>;
+        userId?: number;
+      }
+    ): Promise<ITravelPlanResult> {
+      const { page, limit, sortBy, sortOrder, searchTerm, filters, userId } = params;
+      const skip = (page - 1) * limit;
 
-    const where: Prisma.TravelPlanWhereInput = {};
+      const where: Prisma.TravelPlanWhereInput = {};
 
-    // Search term
-    if (searchTerm) {
-      where.OR = [
-        { destination: { contains: searchTerm, mode: "insensitive" } },
-        { country: { contains: searchTerm, mode: "insensitive" } },
-        { description: { contains: searchTerm, mode: "insensitive" } },
-        { travelType: { contains: searchTerm, mode: "insensitive" } },
-      ];
-    }
+      // Add userId to where clause
+      if (userId) {
+        where.userId = userId;
+      }
 
-    // Filters
-    if (filters) {
-       // Loop through filters and add exact matches to 'where'
-       Object.entries(filters).forEach(([key, value]) => {
-           if (value !== undefined && value !== null) {
-                // 
-                if(key === 'budgetMin'){
-                   where.budgetMin = { gte: Number(value) }
-                } else if(key === 'budgetMax'){
-                   where.budgetMax = { lte: Number(value) }
-                }
-               else {
-                 (where as any)[key] = value;
-               }
-           }
-       });
-    }
+      // Search term
+      if (searchTerm) {
+        where.OR = [
+          { destination: { contains: searchTerm, mode: "insensitive" } },
+          { country: { contains: searchTerm, mode: "insensitive" } },
+          { description: { contains: searchTerm, mode: "insensitive" } },
+          { travelType: { contains: searchTerm, mode: "insensitive" } },
+        ];
+      }
 
-    const total = await prisma.travelPlan.count({ where });
-    const data = await prisma.travelPlan.findMany({
-      where,
-      orderBy: { [sortBy]: sortOrder },
-      skip,
-      take: limit,
-      include: { user: {select:{userName:true, email:true, image:true}} }
-    });
+      // Filters
+      if (filters) {
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            // Handle budget range filters
+            if (key === 'budgetMin') {
+              // User wants plans with budgetMin >= this value
+              // OR plans where their max budget can cover plans with lower minimums
+              where.budgetMin = { lte: Number(value) };
+            } else if (key === 'budgetMax') {
+              // User wants plans with budgetMax <= this value
+              // OR plans where their min budget is covered by higher budgets
+              where.budgetMax = { gte: Number(value) };
+            } else {
+              // Exact match for other filters
+              (where as any)[key] = value;
+            }
+          }
+        });
+      }
 
-    return {
-      meta: {
-        page,
-        limit,
-        total,
-      },
-      data,
-    };
-  },
+      const total = await prisma.travelPlan.count({ where });
+      const data = await prisma.travelPlan.findMany({
+        where,
+        orderBy: { [sortBy]: sortOrder },
+        skip,
+        take: limit,
+        include: { 
+          user: {
+            select: {
+              userName: true, 
+              email: true, 
+              image: true
+            }
+          } 
+        }
+      });
+
+      return {
+        meta: {
+          page,
+          limit,
+          total,
+        },
+        data,
+      };
+    },
+
+
 
   // Get Single Travel Plan
   async getTravelPlanById(id: number) {
     const travelPlan = await prisma.travelPlan.findUnique({
       where: { id },
-      include: { user: {select:{userName:true, email:true, image:true}}, reviews: true },
+      include: { user: true, reviews: true },
     });
 
     if (!travelPlan) {
@@ -153,7 +340,7 @@ export const TravelServices = {
  
 
   // 
-async joinTravelPlan(tripId: number, userId: number) {
+async joinTravelPlan(tripId: number, userId: number, message: string) {
   // Check if travel plan exists
   const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId } });
   if (!travelPlan) {
@@ -187,6 +374,7 @@ async joinTravelPlan(tripId: number, userId: number) {
       friendId: userId,          // joining user
       tripId: tripId,
       status: FriendshipStatus.PENDING,         // or "ACCEPTED" if auto-approved
+      message: message,
     },
   });
 

@@ -63,22 +63,48 @@ export const StatsService = {
   },
   // 
    // Popular destinations
-  getPopularDestinations: async () => {
-    // Group by destination and count the number of travel plans
-    const result = await prisma.travelPlan.groupBy({
-      by: ["destination", "country"],
-      _count: { destination: true },
-      orderBy: { _count: { destination: "desc" } },
-      take: 10,
-    });
+    // Popular destinations
+    getPopularDestinations: async () => {
+      // STEP 1: Group by destination + country
+      const groups = await prisma.travelPlan.groupBy({
+        by: ["destination", "country"],
+        _count: { destination: true, country:true },
+        orderBy: { _count: { destination: "desc" } },
+        take: 10,
+      });
 
-    // Format response
-    return result.map((item) => ({
-      destination: item.destination,
-      country: item.country,
-      plansCount: item._count.destination,
-    }));
-  },
+      // STEP 2: Fetch one travelPlan per destination for extra fields (id + interests)
+      const results = await Promise.all(
+        groups.map(async (item) => {
+          const plan = await prisma.travelPlan.findFirst({
+            where: {
+              destination: item.destination,
+              country: item.country,
+            },
+            select: {
+              id: true,
+              interests: true,
+              startDate:true,
+              endDate:true,
+              
+            },
+          });
+
+          return {
+            destination: item.destination,
+            country: item.country,
+            plansCount: item._count.destination,
+            id: plan?.id ?? null,
+            interests: plan?.interests ?? [],
+            startDate: plan?.startDate ?? null,
+            endDate: plan?.endDate ?? null,
+          };
+        })
+      );
+
+      return results;
+    },
+
   // 
   getReviewStats: async () => {
     // Total Reviews
@@ -123,7 +149,9 @@ export const StatsService = {
     const activePlans = await prisma.travelPlan.count({
       where: { userId, status: TravelPlanStatus.ACTIVE },
     });
-
+   const totalReviews = await prisma.review.count({
+      where: { toUserId: userId },
+    });
     // Average Rating (reviews received)
     const avgRatingAgg = await prisma.review.aggregate({
       _avg: { rating: true },
@@ -132,17 +160,16 @@ export const StatsService = {
     const avgRating = avgRatingAgg._avg.rating || 0;
 
     // Countries (distinct)
-    const countriesRaw = await prisma.travelPlan.findMany({
+    const countryCount = await prisma.travelPlan.count({
       where: { userId },
-      select: { country: true },
     });
-    const countries = Array.from(new Set(countriesRaw.map(c => c.country)));
 
     return {
       totalPlans,
       activePlans,
       avgRating: Number(avgRating.toFixed(2)),
-      countries,
+      countryCount,
+      totalReviews
     };
   },
 

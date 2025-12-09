@@ -30,6 +30,19 @@ const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunc
   });
 });
 
+
+// Update User
+const updateUserVerifiedStaus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const user = await UserServices.updateUserVerifiedStaus(+req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "User Status Updated Successfully",
+    data: user,
+  });
+});
+
 // Get All Users with pagination, filtering, sorting
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, sortBy, sortOrder, searchTerm, ...filters } = req.query;
@@ -112,5 +125,6 @@ export const UserControllers = {
   deleteUser,
   createUserProfile,
   getUserProfile,
+  updateUserVerifiedStaus
 
 };

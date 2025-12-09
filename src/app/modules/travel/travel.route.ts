@@ -3,6 +3,7 @@ import { TravelController } from "./travel.controller.js";
 import { checkVerifiedUser } from "../../middlewares/checkVerifiedUser.js";
 import { createTravelPlanZodSchema, updateTravelPlanZodSchema} from "./travel.validation.js";
 import { validationRequest } from "../../middlewares/validationReq.js";
+import { Role } from "../../../generated/prisma/enums.js";
 
 const router = Router();
 
@@ -11,6 +12,10 @@ router.post("/create", validationRequest(createTravelPlanZodSchema),checkVerifie
 
 // Get All Travel Plans
 router.get("/",checkVerifiedUser(),TravelController.getAllTravelPlans);
+// 
+router.get("/mine",checkVerifiedUser(),TravelController.getAllTravelPlansMine);
+// Get All Travel Plans
+router.get("/admin",checkVerifiedUser(Role.ADMIN),TravelController.getAllTravelPlansAdmin);
 
 // Get Single Travel Plan
 router.get("/:id",TravelController.getTravelPlanById);
