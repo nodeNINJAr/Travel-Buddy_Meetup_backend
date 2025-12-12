@@ -1,5 +1,3 @@
-
-import { verify } from "crypto";
 import { prisma } from "../../../lib/prisma.js";
 import { IUser } from "../../../type/index.js";
 import { hashPassword } from "../../../utils/hash.utils.js";
@@ -88,7 +86,7 @@ async createUser(payload: IUser) {
   // Get All Users with pagination, filtering
   async getAllUsers(params: GetAllUsersParams) {
     const { page, limit, sortBy, sortOrder, searchTerm, filters } = params;
-
+     console.log(searchTerm,filters)
     const skip = (page - 1) * limit;
     const where: any = {};
 
@@ -96,7 +94,7 @@ async createUser(payload: IUser) {
     // Apply search term
     if (searchTerm) {
       where.OR = [
-        { name: { contains: searchTerm, mode: "insensitive" } },
+        { userName: { contains: searchTerm, mode: "insensitive" } },
         { email: { contains: searchTerm, mode: "insensitive" } },
       ];
     }

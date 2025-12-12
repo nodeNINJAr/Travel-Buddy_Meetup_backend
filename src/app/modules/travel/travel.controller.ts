@@ -169,6 +169,20 @@ const getJoinedUsersAdmin = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// change status
+const changeStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const status = req.body;
+    const result = await TravelServices.changeStatus(Number(req.params.id), user.userId, status);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan status changed successfully",
+        data: result,
+    });
+});
+
 export const TravelController = {
     createTravelPlan,
     getAllTravelPlans,
@@ -180,4 +194,5 @@ export const TravelController = {
     getJoinedUsersAdmin,
     getAllTravelPlansAdmin,
     getAllTravelPlansMine,
+    changeStatus
 };

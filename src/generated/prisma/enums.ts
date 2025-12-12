@@ -37,7 +37,9 @@ export type Gender = (typeof Gender)[keyof typeof Gender]
 export const TravelPlanStatus = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
-  BLOCKED: 'BLOCKED'
+  BLOCKED: 'BLOCKED',
+  CANCELLED: 'CANCELLED',
+  COMPLETED: 'COMPLETED'
 } as const
 
 export type TravelPlanStatus = (typeof TravelPlanStatus)[keyof typeof TravelPlanStatus]

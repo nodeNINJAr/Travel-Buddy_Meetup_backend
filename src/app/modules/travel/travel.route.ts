@@ -11,7 +11,7 @@ const router = Router();
 router.post("/create", validationRequest(createTravelPlanZodSchema),checkVerifiedUser(),TravelController.createTravelPlan);
 
 // Get All Travel Plans
-router.get("/",checkVerifiedUser(),TravelController.getAllTravelPlans);
+router.get("/",TravelController.getAllTravelPlans);
 // 
 router.get("/mine",checkVerifiedUser(),TravelController.getAllTravelPlansMine);
 // Get All Travel Plans
@@ -33,6 +33,6 @@ router.get("/joined-users/:id",checkVerifiedUser(),TravelController.getJoinedUse
 // 
 router.get("/admin/joined-users", checkVerifiedUser(), TravelController.getJoinedUsersAdmin);
 // 
-
+router.patch("/change-status/:id",checkVerifiedUser(),TravelController.changeStatus);
 
 export const TravelRoutes = router;

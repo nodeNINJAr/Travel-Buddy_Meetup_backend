@@ -18,6 +18,8 @@ enum TravelPlanStatus {
      ACTIVE
      INACTIVE
      BLOCKED
+     CANCELLED
+     COMPLETED
 }
 
 enum FriendshipStatus {
@@ -27,7 +29,7 @@ enum FriendshipStatus {
 }
 
 enum ReviewStatus {
-      PENDING
-      APPROVED
-      REJECT
+     PENDING
+     APPROVED
+     REJECT
 }

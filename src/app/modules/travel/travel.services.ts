@@ -59,7 +59,6 @@ export const TravelServices = {
         ];
       }
 
-      console.log(filters);
 
       // Filters
       if (filters) {
@@ -81,6 +80,10 @@ export const TravelServices = {
             else if (key === 'interests') {
               where.interests = { has: value };
             }
+            // Handle status filter
+            else if (key === 'status') {
+              where.status = value;
+            }
             // Handle exact match filters (travelType, destination, country, etc.)
             else {
               (where as any)[key] = value;
@@ -88,8 +91,6 @@ export const TravelServices = {
           }
         });
       }
-
-      console.log(where);
 
       const total = await prisma.travelPlan.count({ where });
       const data = await prisma.travelPlan.findMany({
@@ -289,7 +290,7 @@ export const TravelServices = {
   async getTravelPlanById(id: number) {
     const travelPlan = await prisma.travelPlan.findUnique({
       where: { id },
-      include: { user: true, reviews: true },
+      include: { user: true, reviews: true, friendships: true },
     });
 
     if (!travelPlan) {
@@ -347,7 +348,10 @@ async joinTravelPlan(tripId: number, userId: number, message: string) {
     throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
   }
   // 
-    if (travelPlan.status === TravelPlanStatus.INACTIVE ) {
+    if (travelPlan.status === TravelPlanStatus.INACTIVE 
+      || travelPlan.status === TravelPlanStatus.BLOCKED 
+      || travelPlan.status === TravelPlanStatus.CANCELLED 
+      || travelPlan.status === TravelPlanStatus.COMPLETED) {
     throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
   }
 
@@ -385,7 +389,7 @@ async joinTravelPlan(tripId: number, userId: number, message: string) {
 async getJoinedUsers(tripId: number, userId: number) {
   console.log(tripId, userId)
   // Check if travel plan exists
-  const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId, userId } });
+  const travelPlan = await prisma.travelPlan.findUnique({ where: { id: tripId } });
   if (!travelPlan) {
     throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
   }
@@ -397,8 +401,11 @@ async getJoinedUsers(tripId: number, userId: number) {
   });
 
   // Map to only user data
-  return joinedUsers.map(f => f.friend);
+  return joinedUsers;
 },
+
+
+
 // 
 async getJoinedUsersadmin(tripId: number, userId: number) {
   console.log(tripId, userId)
@@ -416,7 +423,34 @@ async getJoinedUsersadmin(tripId: number, userId: number) {
 
   // Map to only user data
   return joinedUsers.map(f => f.friend);
-}
+},
+
+// 
+async changeStatus(tripId: number, userId: number, status:any) {
+  // Check if travel plan exists
+  const travelPlan = await prisma.travelPlan.findFirst({ where: { id:tripId, userId } });
+  if (!travelPlan) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Travel plan not found");
+  }
+  const friendship = await prisma.friendship.findFirst({ where: { tripId:travelPlan.id} });
+  if (!friendship) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Friendship not found");
+  }
+  console.log(status)
+  // 
+  if(!status){
+    throw new AppError(StatusCodes.BAD_REQUEST, "Status is required");
+  }
+
+  // 
+  const updatedFriendship = await prisma.friendship.update({
+    where: { id: friendship.id },
+    data: status,
+  });
+
+  // Map to only user data
+  return updatedFriendship;
+},
 
 
 };
