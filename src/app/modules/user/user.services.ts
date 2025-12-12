@@ -1,4 +1,3 @@
-
 import { prisma } from "../../../lib/prisma.js";
 import { IUser } from "../../../type/index.js";
 import { hashPassword } from "../../../utils/hash.utils.js";
@@ -57,28 +56,65 @@ async createUser(payload: IUser) {
     });
     return updatedUser;
   },
+//  
+  // Update User
+  async updateUserVerifiedStaus(id: number) {
+    // 
+    const userp = await prisma.profile.findUnique({
+      where: { id: Number(id) },
+    });
+   //
+    if (userp === null) {
+      throw new AppError(404, "User not found");
+    }
+    const payload = {
+      verified: true,
+    }
+    // 
+    if(userp.verified==true){
+      payload.verified = false;
+    }
+    
+    // 
+    const updatedUser = await prisma.profile.update({
+      where: { id: Number(id) },
+      data: payload,
+    });
+    return updatedUser;
+  },
 
   // Get All Users with pagination, filtering
   async getAllUsers(params: GetAllUsersParams) {
     const { page, limit, sortBy, sortOrder, searchTerm, filters } = params;
-
+     console.log(searchTerm,filters)
     const skip = (page - 1) * limit;
     const where: any = {};
 
+  
     // Apply search term
     if (searchTerm) {
       where.OR = [
-        { name: { contains: searchTerm, mode: "insensitive" } },
+        { userName: { contains: searchTerm, mode: "insensitive" } },
         { email: { contains: searchTerm, mode: "insensitive" } },
       ];
     }
 
     // Apply filters
     if (filters) {
-      Object.assign(where, filters);
+      if(filters.verified==="true"){
+        where.profile={
+          verified:true
+        }
+      }
+      
+      if(filters.verified==="false"){
+        where.profile={
+          verified:false
+        }
+      }
+     
     }
-
-    const total = await prisma.user.count({ where });
+    const total = await prisma.user.count({where});
     const data = await prisma.user.findMany({
       where,
       orderBy: { [sortBy]: sortOrder },

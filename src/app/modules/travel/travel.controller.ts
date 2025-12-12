@@ -21,16 +21,62 @@ const createTravelPlan = catchAsync(async (req: Request, res: Response, next: Ne
 });
 
 // Get All Travel Plans
-const getAllTravelPlans = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const getAllTravelPlansAdmin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { page, limit, sortBy, sortOrder, searchTerm, ...filters } = req.query;
 
-    const result = await TravelServices.getAllTravelPlans({
+    const result = await TravelServices.getAllTravelPlansAdmin({
         page: Number(page) || 1,
         limit: Number(limit) || 10,
         sortBy: (sortBy as string) || "createdAt",
         sortOrder: (sortOrder as "asc" | "desc") || "desc",
         searchTerm: searchTerm as string,
         filters,
+    });
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plans retrieved successfully",
+        data: result.data,
+        meta: result.meta,
+    });
+});
+
+
+// Get All Travel Plans
+const getAllTravelPlans = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { page, limit, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+    const result = await TravelServices.getAllTravelPlans({
+        page: Number(page) || 1,
+        limit: Number(limit) || 10,
+        searchTerm: searchTerm as string,
+        filters
+    });
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plans retrieved successfully",
+        data: result.data,
+        meta: result.meta,
+    });
+});
+
+
+
+// Get All Travel Plans
+const getAllTravelPlansMine = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { page, limit, sortBy, sortOrder, searchTerm, ...filters } = req.query;
+    const user = req.user as JwtPayload;
+     console.log(page, limit)
+    const result = await TravelServices.getAllTravelPlansMine({
+        page: Number(page) || 1,
+        limit: Number(limit) || 10,
+        sortBy: (sortBy as string) || "createdAt",
+        sortOrder: (sortOrder as "asc" | "desc") || "desc",
+        searchTerm: searchTerm as string,
+        filters,
+        userId: user.userId,
     });
 
     sendResponse(res, {
@@ -83,8 +129,8 @@ const deleteTravelPlan = catchAsync(async (req: Request, res: Response, next: Ne
 // make an join req
 const joinTravelPlan = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user as JwtPayload;
-    const result = await TravelServices.joinTravelPlan(Number(req.params.id), user.userId);
-
+    const result = await TravelServices.joinTravelPlan(Number(req.params.id), user.userId, req.body.message);
+    console.log(req.body.message)
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,
@@ -123,6 +169,20 @@ const getJoinedUsersAdmin = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+// change status
+const changeStatus = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as JwtPayload;
+    const status = req.body;
+    const result = await TravelServices.changeStatus(Number(req.params.id), user.userId, status);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: "Travel plan status changed successfully",
+        data: result,
+    });
+});
+
 export const TravelController = {
     createTravelPlan,
     getAllTravelPlans,
@@ -131,5 +191,8 @@ export const TravelController = {
     deleteTravelPlan,
     joinTravelPlan,
     getJoinedUsers,
-    getJoinedUsersAdmin
+    getJoinedUsersAdmin,
+    getAllTravelPlansAdmin,
+    getAllTravelPlansMine,
+    changeStatus
 };

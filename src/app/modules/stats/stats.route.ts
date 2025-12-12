@@ -10,12 +10,12 @@ const router = Router();
 router.get("/users", checkVerifiedUser(Role.ADMIN), StatsController.getStats);
 
 // GET /api/stats/popular-destinations
-router.get("/popular-destinations", checkVerifiedUser(Role.ADMIN), StatsController.getPopularDestinations);
+router.get("/popular-destinations", checkVerifiedUser(), StatsController.getPopularDestinations);
 // 
 router.get("/reviews", checkVerifiedUser(Role.ADMIN), StatsController.getReviewStats);
 // 
 // Get per-user stats
-router.get("/user", checkVerifiedUser(Role.USER), StatsController.getUserStats);
+router.get("/user", checkVerifiedUser(), StatsController.getUserStats);
 
 
 export const StatsRoutes = router;
