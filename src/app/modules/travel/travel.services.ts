@@ -17,8 +17,8 @@ export const TravelServices = {
               country:payload.country,
               description:payload.description,
               travelType:payload.travelType,
-              budgetMin:payload.budgetMin,
-              budgetMax:payload.budgetMax,
+              budgetMin:Number(payload.budgetMin),
+              budgetMax:Number(payload.budgetMax),
            }
        });
 
