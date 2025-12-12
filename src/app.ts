@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser"
 const app: Application = express();
 app.use(
   cors({
-    origin: ['http://localhost:3000','https://travel-management-frontend-180skbgyp.vercel.app', 'https://travel-management-frontend-j6hfop2se.vercel.app'],
+    origin: ['http://localhost:3000','https://travel-management-frontend-rosy.vercel.app'],
     credentials: true,
    })
 );
