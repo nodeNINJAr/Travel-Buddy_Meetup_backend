@@ -10,10 +10,12 @@ import expressSession from "express-session"
 import cookieParser from "cookie-parser"
 
 const app: Application = express();
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true
-}));
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'https://travel-management-frontend-j6hfop2se.vercel.app'],
+    credentials: true,
+   })
+);
 app.use(expressSession({
     secret:config.express_session_secret,
     resave:false,
