@@ -8,22 +8,20 @@ export interface AuthTokens{
 }
 
 
-export const setAuthCookies =(res:Response, tokenInfo:AuthTokens)=>{
-        // 
-        if(tokenInfo.accessToken){
-            // acces token set to cookie    
-               res.cookie("accessToken", tokenInfo.accessToken,{
-                 httpOnly:true,
-                 secure:false,
-               })    
-        }
-        // 
-        if(tokenInfo.refreshToken){   
-            // refrsh token set to cookies
-            res.cookie("refreshToken", tokenInfo.refreshToken,{
-                httpOnly:true,
-                secure:false,
-            })    
+export const setAuthCookies = (res: Response, tokenInfo: AuthTokens) => {
 
-        }
-}
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true, // HTTPS required
+    sameSite: "none" as "none", // allow cross-site cookies
+    // domain: ".onrender.com", // optional, use if still not working
+  };
+
+  if (tokenInfo.accessToken) {
+    res.cookie("accessToken", tokenInfo.accessToken, cookieOptions);
+  }
+
+  if (tokenInfo.refreshToken) {
+    res.cookie("refreshToken", tokenInfo.refreshToken, cookieOptions);
+  }
+};
